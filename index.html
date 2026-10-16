@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<title>Growth Audit — Calculator Plus</title>
+<link rel="icon" href="img/app-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: only light;
+  /* ---- Calculator Plus, extracted from their live screens ---- */
+  --cp-bg:#F4F5F6; --cp-card:#FFFFFF; --cp-line:#E3E5E7; --cp-sel:#EEF3F6;
+  --cp-teal:#6F9CAB; --cp-banner:#73A7B8; --cp-red:#E62031;
+  --cp-ink:#232321; --cp-ink2:#333333; --cp-txt:#5E6468; --cp-muted:#8A8F93; --cp-soft:#F7F7F7;
+  --cp-lcd:#7EB8CB; --cp-lcd-ink:#0F232B; --cp-metal:#D4D4D4;
+  --cp-f-green:#10A47D; --cp-f-orange:#F28F45; --cp-f-pink:#D63FB8; --cp-f-blue:#399EFA; --cp-f-slate:#7E8794;
+  --r-ctl:12px; --r-media:16px;
+  /* ---- the report shell, in Calculator Plus's own palette ---- */
+  --bg:#F4F5F6; --bg2:#FFFFFF; --surf:#FFFFFF;
+  --hair:rgba(35,35,33,.09); --hair2:rgba(35,35,33,.16);
+  --ink:#232321; --ink2:#4E5357; --ink3:#868B8F;
+  --accent:#6F9CAB; --accent-lift:#44707F;
+  --panel:#FFFFFF; --panel-ink:#15181B; --panel-muted:#5F666D; --panel-line:#E9ECEF;
+  --accent-ink:#3B6573;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+@media(max-width:700px){.wrap{padding:0 20px}}
+
+/* ============ top bar ============ */
+.nav{position:sticky;top:0;z-index:70;background:rgba(244,245,246,.86);backdrop-filter:blur(18px) saturate(160%);
+  border-bottom:1px solid var(--hair)}
+.nav-in{max-width:1080px;margin:0 auto;padding:0 32px;height:58px;display:flex;align-items:center;gap:18px}
+@media(max-width:700px){.nav-in{padding:0 20px;gap:12px}}
+.nav-brand{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+.nav-brand .mk{width:26px;height:26px;flex:none;display:block;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.nav-brand .mk img{width:26px;height:26px;display:block}
+.nav-brand span{color:var(--ink2);font-weight:500}
+.nav-brand b{color:var(--ink);font-weight:600}
+.nav-links{margin-left:auto;display:flex;gap:2px;align-items:center}
+.nav-links button{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink3);transition:.16s}
+.nav-links button:hover{color:var(--ink)}
+.nav-links button.on{color:var(--ink);background:#fff;box-shadow:0 1px 4px rgba(35,35,33,.08)}
+@media(max-width:640px){.nav-brand span{display:none}}
+
+.view{display:none}
+.view.on{display:block}
+
+/* ============ hero ============ */
+.hero{padding:104px 0 0;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-340px;left:50%;transform:translateX(-50%);
+  width:1100px;height:640px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(111,156,171,.22),transparent 72%)}
+.hero::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(38% 46% at 8% 20%,rgba(126,184,203,.26),transparent 70%),
+   radial-gradient(34% 42% at 92% 18%,rgba(242,169,98,.20),transparent 70%)}
+.hero>*{position:relative;z-index:1}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-lift);margin-bottom:26px}
+.hero h1{font-size:76px;line-height:.98;font-weight:700;letter-spacing:-.045em;margin:0 0 24px}
+@media(max-width:820px){.hero h1{font-size:50px}.hero{padding-top:70px}}
+.hero .lede{font-size:20px;line-height:1.5;font-weight:400;color:var(--ink2);max-width:600px;margin:0 auto;letter-spacing:-.012em}
+@media(max-width:820px){.hero .lede{font-size:17px}}
+.hero .meta{margin-top:30px;font-size:12.5px;color:var(--ink3);letter-spacing:.02em}
+.hero .meta b{color:var(--ink2);font-weight:600}
+
+.stats{display:flex;justify-content:center;gap:0;margin:70px auto 0;max-width:760px;
+  border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.stat{flex:1;padding:26px 14px;text-align:center;border-left:1px solid var(--hair)}
+.stat:first-child{border-left:none}
+.stat b{display:block;font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--ink)}
+.stat span{display:block;font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.35}
+@media(max-width:700px){.stat b{font-size:19px}.stat{padding:18px 8px}}
+
+.fb{max-width:760px;margin:0 auto;padding:30px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:26px;text-align:left}
+@media(max-width:700px){.fb{grid-template-columns:1fr;gap:20px;padding-top:24px}}
+.fb-k{grid-column:1/-1;font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink3);text-align:center;margin-bottom:-6px}
+.fb-i{display:flex;gap:12px;align-items:flex-start}
+.fb-i .tick{width:18px;height:18px;flex:none;margin-top:3px;border-radius:50%;background:rgba(111,156,171,.2);
+  display:grid;place-items:center}
+.fb-i .tick svg{width:10px;height:10px;stroke:var(--accent-lift);stroke-width:3;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.fb-i p{font-size:14px;line-height:1.55;color:var(--ink2);margin:0}
+.fb-i p b{color:var(--ink);font-weight:700}
+
+.sec{padding:96px 0}
+.sec-k{font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);margin-bottom:18px}
+.sec h2{font-size:38px;line-height:1.14;font-weight:700;letter-spacing:-.035em;margin:0 0 20px;max-width:680px}
+@media(max-width:820px){.sec h2{font-size:29px}.sec{padding:64px 0}}
+.sec p.body{font-size:17px;line-height:1.66;color:var(--ink2);max-width:640px;margin:0 0 18px;letter-spacing:-.008em}
+.sec p.body b{color:var(--ink);font-weight:600}
+.rule{height:1px;background:var(--hair);margin:0}
+
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px;max-width:820px}
+@media(max-width:760px){.notes{grid-template-columns:1fr}}
+.note{background:var(--surf);border:1px solid var(--hair);box-shadow:0 2px 10px rgba(35,35,33,.04);border-radius:16px;padding:24px 26px}
+.note h4{font-size:15px;font-weight:700;letter-spacing:-.015em;margin:0 0 8px}
+.note p{font-size:14px;line-height:1.6;color:var(--ink2);margin:0}
+
+.ideas{display:flex;flex-direction:column;gap:0;margin-top:14px;border-top:1px solid var(--hair)}
+.idea{display:grid;grid-template-columns:52px 1fr 180px;gap:26px;align-items:start;
+  padding:30px 4px;border-bottom:1px solid var(--hair);text-align:left;width:100%;transition:.18s}
+.idea:hover{background:rgba(255,255,255,.7)}
+@media(max-width:780px){.idea{grid-template-columns:38px 1fr;gap:16px}}
+.idea .no{font-size:13px;font-weight:700;color:var(--ink3);padding-top:4px;letter-spacing:.02em}
+.idea h3{font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.024em;margin:0 0 7px}
+@media(max-width:820px){.idea h3{font-size:18px}}
+.idea p{font-size:14.5px;line-height:1.6;color:var(--ink2);margin:0;max-width:540px}
+.idea .out{text-align:right;padding-top:3px}
+@media(max-width:780px){.idea .out{grid-column:2;text-align:left;padding-top:12px}}
+.idea .out b{display:block;font-size:19px;font-weight:700;letter-spacing:-.025em;color:var(--accent-lift);white-space:nowrap}
+.idea .out span{display:block;font-size:10.5px;color:var(--ink3);margin-top:3px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.idea .seeit{display:inline-flex;align-items:center;gap:5px;margin-top:11px;font-size:12.5px;
+  font-weight:600;color:var(--accent-lift)}
+.idea .seeit svg{width:12px;height:12px}
+
+.band{background:var(--surf);border:1px solid var(--hair);border-radius:28px;box-shadow:0 2px 10px rgba(35,35,33,.04);padding:40px 44px;margin-top:44px;
+  display:flex;align-items:center;gap:36px;flex-wrap:wrap}
+@media(max-width:700px){.band{padding:28px 24px;gap:22px}}
+.band .lab{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.band .txt{flex:1;min-width:240px}
+.band .txt p{font-size:15.5px;line-height:1.6;color:var(--ink2);margin:0}
+.band .nums{display:flex;gap:34px}
+.band .nums div b{display:block;font-size:30px;font-weight:700;letter-spacing:-.035em;color:var(--accent-lift)}
+.band .nums div span{display:block;font-size:11px;color:var(--ink3);margin-top:2px;letter-spacing:.04em;
+  text-transform:uppercase;font-weight:600}
+
+.cta-row{display:flex;justify-content:center;margin-top:52px;align-items:center;gap:22px;flex-wrap:wrap}
+.bigbtn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;
+  font-size:15px;font-weight:700;letter-spacing:-.01em;padding:15px 26px;border-radius:30px;transition:.16s}
+.bigbtn:hover{filter:brightness(1.06)}
+.bigbtn svg{width:15px;height:15px}
+
+.foot{border-top:1px solid var(--hair);padding:36px 0 70px;font-size:12.5px;line-height:1.6;color:var(--ink3)}
+
+/* ============ prototype stage ============ */
+.stage{display:grid;grid-template-columns:minmax(440px,1fr) minmax(400px,470px);gap:0;
+  align-items:start;min-height:calc(100vh - 58px)}
+@media(max-width:1080px){.stage{grid-template-columns:1fr}}
+.phonecol{padding:34px 24px 46px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.panelcol{border-left:1px solid var(--hair);background:var(--panel);color:var(--panel-ink);
+  min-height:calc(100vh - 58px);position:sticky;top:58px;max-height:calc(100vh - 58px);overflow-y:auto}
+@media(max-width:1080px){.panelcol{position:static;max-height:none;border-left:none;border-top:1px solid var(--hair)}}
+
+.phone{position:relative;width:390px;height:844px;flex:none;background:#000;border:11px solid #000;
+  border-radius:46px;box-shadow:0 0 0 1.5px #D3D7DA,0 34px 70px -22px rgba(35,35,33,.35)}
+.phone-in{position:absolute;inset:0;border-radius:36px;overflow:hidden;background:var(--cp-bg);color-scheme:only light}
+.island{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:104px;height:30px;background:#000;
+  border-radius:16px;z-index:60;pointer-events:none}
+.sbar{position:absolute;top:0;left:0;right:0;height:50px;z-index:55;pointer-events:none;display:flex;
+  align-items:center;justify-content:space-between;padding:14px 28px 0 34px;font:600 15px/1 -apple-system,'Inter',sans-serif;color:#111;transition:color .3s}
+.sbar.light{color:#fff}
+.sbar .glyphs{display:flex;gap:5px;align-items:center}
+.homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;
+  border-radius:3px;background:#111;z-index:56;pointer-events:none;transition:background .3s}
+.homebar.light{background:rgba(255,255,255,.9)}
+.screenwrap{position:absolute;inset:0;overflow:hidden;background:var(--cp-bg)}
+
+/* ============ phone screens — Calculator Plus's system, all prefixed scr-/cp- ============ */
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--cp-bg);color:var(--cp-ink);
+  font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
+  transform:translateX(100%);transition:transform .36s cubic-bezier(.32,.72,0,1);z-index:10;will-change:transform}
+.scr.is-active{transform:translateX(0);z-index:20}
+.scr.is-past{transform:translateX(-24%)}
+.scr.sheet{transform:translateY(100%)}
+.scr.sheet.is-active{transform:translateY(0);z-index:30}
+.scr.nofx{transition:none}
+.scr-top{flex:none;padding:58px 20px 0;position:relative;z-index:2}
+.scr-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 20px;scrollbar-width:none;position:relative;z-index:2}
+.scr-body::-webkit-scrollbar{display:none}
+.scr-foot{flex:none;padding:12px 20px 30px;position:relative;z-index:2}
+
+/* their soft paywall background shapes */
+.cp-shapes{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.cp-shapes i{position:absolute;display:block;background:rgba(255,255,255,.75);border-radius:40px}
+.cp-shapes .a{width:520px;height:220px;left:-80px;top:120px;transform:rotate(-38deg);background:rgba(232,235,238,.7)}
+.cp-shapes .b{width:300px;height:70px;right:-40px;top:200px;transform:rotate(-22deg);border-radius:36px}
+.cp-shapes .c{width:230px;height:230px;right:-70px;top:-60px;transform:rotate(45deg);background:rgba(232,235,238,.75);border-radius:30px}
+
+.cp-btn{display:block;width:100%;height:50px;border-radius:var(--r-ctl);background:var(--cp-teal);color:#fff;
+  font:500 18px/1 -apple-system,'Inter',sans-serif;letter-spacing:-.005em;transition:filter .15s;
+  box-shadow:0 4px 12px -6px rgba(60,100,115,.55)}
+.cp-btn.b{font-weight:700;font-size:19px}
+.cp-btn:hover{filter:brightness(1.04)}
+.cp-btn[disabled]{background:#B9CDD4;box-shadow:none;cursor:default}
+.cp-ghost{display:block;width:100%;height:38px;margin-top:6px;font:500 15px/1 -apple-system,'Inter',sans-serif;color:var(--cp-txt)}
+.cp-back,.cp-x{width:32px;height:32px;flex:none;border-radius:50%;background:#E8EAEC;display:grid;place-items:center;color:#2E2E2E}
+.cp-back svg,.cp-x svg{width:16px;height:16px}
+
+/* splash */
+.scr--splash{background:#000;cursor:pointer}
+.cp-splash{position:absolute;inset:0;display:grid;place-items:center}
+.cp-splash img{width:142px;height:142px;display:block}
+
+/* use question — their tracking-screen type, their plan-tile surfaces */
+.cp-h{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-align:center;color:var(--cp-ink);margin:14px 6px 0}
+.cp-sub{font-size:15px;line-height:1.4;color:var(--cp-txt);text-align:center;margin:8px 0 0}
+.scr--use{background:#fff}
+.cp-uses{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.cp-use{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--cp-line);
+  border-radius:var(--r-ctl);padding:15px 16px;font:400 16.5px/1.3 -apple-system,'Inter',sans-serif;color:var(--cp-ink2);transition:.15s}
+.cp-use svg{width:24px;height:24px;flex:none;stroke:#3A3A3A;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cp-use.on{border:2px solid var(--cp-teal);background:var(--cp-sel);padding:14.5px 15.5px}
+.cp-use .rd{margin-left:auto;width:22px;height:22px;flex:none;border-radius:50%;border:1.5px solid #C9CDD0;display:grid;place-items:center}
+.cp-use.on .rd{border-color:var(--cp-teal);background:var(--cp-teal)}
+.cp-use .rd i{width:8px;height:8px;border-radius:50%;background:#fff;opacity:0}
+.cp-use.on .rd i{opacity:1}
+.cp-softcard{background:var(--cp-soft);border-radius:var(--r-ctl);padding:14px 16px;font-size:14.5px;line-height:1.35;color:var(--cp-txt);text-align:center;margin-bottom:14px}
+
+/* the calculator — their brushed metal, blue display, keys */
+.scr--calc{background:var(--cp-metal)}
+.cp-metal{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.18) 0 1px,rgba(0,0,0,.035) 1px 2px,rgba(255,255,255,.06) 2px 3px),
+  linear-gradient(180deg,#DADADA,#D0D0D0 60%,#D6D6D6)}
+.cp-banner{display:flex;align-items:center;gap:14px;height:58px;padding:0 16px;margin:0 -16px;background:var(--cp-banner);color:#fff;
+  font:600 17px/1 -apple-system,'Inter',sans-serif;letter-spacing:-.01em;width:calc(100% + 32px);text-align:left;position:relative;overflow:hidden}
+.cp-banner::after{content:'';position:absolute;right:30px;top:-6px;width:70px;height:70px;opacity:.12;
+  background:conic-gradient(from 18deg,#fff 0 10%,transparent 0 20%,#fff 0 30%,transparent 0 40%,#fff 0 50%,transparent 0 60%,#fff 0 70%,transparent 0 80%,#fff 0 90%,transparent 0);border-radius:50%}
+.cp-banner svg{width:26px;height:26px;flex:none}
+.cp-banner .ch{margin-left:auto;width:14px;height:14px}
+.cp-hdr{display:flex;align-items:center;justify-content:space-between;height:48px;font:300 17px/1 -apple-system,'Inter',sans-serif;letter-spacing:.02em;color:#2A2A2A}
+.cp-hdr b{font-weight:700}
+.cp-hdr svg{width:24px;height:24px;stroke:#2A2A2A;stroke-width:2.2;stroke-linecap:round}
+.cp-lcd{position:relative;background:var(--cp-lcd);border:2px solid #2C3034;border-radius:14px;height:var(--lcd,132px);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.6);padding:0 18px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.cp-lcd .mn{font:300 52px/1.1 -apple-system,'Inter',sans-serif;color:var(--cp-lcd-ink);text-align:right;white-space:nowrap;letter-spacing:-.02em}
+.cp-lcd .ln{height:1px;background:rgba(20,40,50,.45);margin:6px 0 6px}
+.cp-lcd .sb{font:400 17px/1.2 -apple-system,'Inter',sans-serif;color:#1E3E4A;text-align:right;white-space:nowrap;min-height:20px;overflow:hidden;text-overflow:ellipsis}
+.cp-lcd .hd{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:26px;height:3px;border-radius:2px;background:rgba(20,40,50,.4)}
+.cp-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap,11px);margin-top:14px}
+.ck{height:var(--kh,68px);border-radius:10px;border:1.5px solid #262626;
+  background:linear-gradient(180deg,#C9C7C1,#B3B1AC);color:#1D1D1D;
+  font:300 40px/1 -apple-system,'Inter',sans-serif;display:grid;place-items:center;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.08),0 2px 0 #1b1b1b,0 4px 6px rgba(0,0,0,.22);
+  transition:transform .06s,box-shadow .06s}
+.ck:active,.ck.prs{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 0 #1b1b1b,0 1px 2px rgba(0,0,0,.2)}
+.ck.op{background:linear-gradient(180deg,#CDD0D8,#B6BBC5)}
+.ck.mem{height:var(--mh,50px);background:linear-gradient(180deg,#97A0AE,#717A88);border-color:#1E2633;color:#fff;font-size:30px;font-weight:400;letter-spacing:-.02em}
+.ck.ac{background:linear-gradient(180deg,#ECB3AE,#E09F9A);border-color:#B8443B;font-size:38px}
+.ck.eq{background:linear-gradient(180deg,#F5AE66,#EC9752);border-color:#B85E1C;color:#fff}
+.ck.sm{font-size:30px}
+.ck svg{width:34px;height:26px}
+.ck.hl{animation:hl 1.3s ease-in-out infinite}
+@keyframes hl{50%{box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),0 2px 0 #1b1b1b,0 0 0 5px rgba(255,255,255,.75)}}
+.cp-task{display:flex;align-items:center;gap:10px;margin-top:2px}
+.cp-taskc{flex:1;min-width:0;background:rgba(255,255,255,.72);border-radius:var(--r-ctl);padding:9px 12px;font-size:14px;line-height:1.3;color:var(--cp-ink2);
+  box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.cp-taskc small{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4E7C8B;margin-bottom:2px}
+.cp-taskc b{font-weight:700}
+.cp-taskc.ok small{color:#10865F}
+.scr--try{--kh:63px;--mh:46px;--gap:11px;--lcd:122px}
+.scr--try .cp-lcd .mn{font-size:44px}
+.scr--try .ck{font-size:34px}.scr--try .ck.mem{font-size:25px}.scr--try .ck.sm{font-size:25px}
+.scr--try .scr-foot{padding-top:10px;background:linear-gradient(180deg,rgba(212,212,212,0),#D4D4D4 30%)}
+.scr--home .scr-top{padding-top:50px}
+
+/* paywall — their composition */
+.scr--pay{background:var(--cp-bg)}
+.scr--pay .scr-top{padding:56px 20px 0}
+.cp-pay-x{position:absolute;left:16px;top:56px;z-index:4}
+.cp-icon{display:block;width:76px;height:76px;margin:0 auto}
+.cp-wm{font-size:21px;font-weight:700;letter-spacing:-.015em;text-align:center;margin-top:8px;color:var(--cp-ink)}
+.cp-wm em{font-style:normal;color:var(--cp-teal)}
+.cp-for{font-size:14.5px;line-height:1.35;color:var(--cp-txt);text-align:center;margin:5px 10px 0;font-weight:500}
+.cp-proof{display:flex;align-items:center;gap:10px;margin:14px 0 4px;background:rgba(255,255,255,.75);border-radius:var(--r-ctl);padding:8px 10px}
+.cp-rate{flex:none;text-align:center;padding-right:10px;border-right:1px solid var(--cp-line)}
+.cp-rate b{display:block;font-size:19px;font-weight:700;letter-spacing:-.02em;color:var(--cp-ink);line-height:1.1}
+.cp-rate span{display:block;color:#F2A23A;font-size:10px;letter-spacing:1px;line-height:1.2}
+.cp-rate small{display:block;font-size:9.5px;color:var(--cp-muted);line-height:1.2;max-width:84px}
+.cp-press{flex:1;min-width:0}
+.cp-press small{display:block;font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--cp-muted);margin-bottom:3px}
+.cp-press img{display:block;width:100%;height:auto;opacity:.82}
+.cp-feats{display:flex;flex-direction:column;gap:16px;margin-top:14px;padding-bottom:12px}
+.cp-ft{display:flex;gap:16px;align-items:flex-start}
+.cp-fi{width:28px;height:28px;flex:none;border-radius:7px;display:grid;place-items:center;margin-top:2px}
+.cp-fi svg{width:16px;height:16px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cp-ft b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--cp-ink);line-height:1.25}
+.cp-ft p{font-size:14.5px;line-height:1.35;color:var(--cp-txt);margin-top:3px}
+.cp-ft p em{font-style:normal;font-weight:600;color:var(--cp-ink2);background:#E5EEF1;border-radius:5px;padding:0 4px}
+.scr--pay .scr-foot{background:#fff;padding:22px 14px 22px;box-shadow:0 -1px 0 rgba(0,0,0,.04),0 -10px 24px -14px rgba(0,0,0,.12)}
+.cp-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cp-plan{position:relative;height:98px;border:1.5px solid var(--cp-line);border-radius:var(--r-ctl);background:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;transition:.15s;padding:0 2px}
+.cp-plan.on{border:2.5px solid var(--cp-teal);background:var(--cp-sel)}
+.cp-plan .t{font-size:15px;font-weight:500;color:var(--cp-ink2)}
+.cp-plan .p{font-size:23px;font-weight:700;letter-spacing:-.02em;color:var(--cp-ink);line-height:1.05;white-space:nowrap}
+.cp-plan s{font-size:13.5px;color:var(--cp-muted)}
+.cp-save{position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--cp-red);color:#fff;
+  font-size:12px;font-weight:600;border-radius:5px;padding:2px 7px}
+.cp-help{font-size:12.5px;color:var(--cp-ink);text-align:center;margin-top:12px;font-weight:500}
+.cp-legal{font-size:10px;line-height:1.35;color:var(--cp-muted);text-align:center;margin:4px 4px 10px;min-height:27px}
+.cp-links{display:flex;justify-content:center;gap:8px;margin-top:10px;font-size:11.5px;color:#444}
+.cp-links a{text-decoration:underline;text-underline-offset:2px}
+
+/* offer on close — comparison-led, Forever only */
+.scr--offer{background:var(--cp-bg)}
+.cp-ok{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cp-teal);text-align:center;margin-top:6px}
+.cp-oh{font-size:25px;line-height:1.15;font-weight:700;letter-spacing:-.02em;text-align:center;margin:6px 0 0;color:var(--cp-ink)}
+.cp-os{font-size:14.5px;color:var(--cp-txt);text-align:center;margin-top:6px}
+.cp-cmp{background:#fff;border-radius:var(--r-media);margin-top:18px;padding:6px 14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.cp-cr{display:grid;grid-template-columns:1fr 56px 56px;align-items:center;min-height:42px;border-top:1px solid #EEF0F2;font-size:14.5px;color:var(--cp-ink2)}
+.cp-cr:first-child{border-top:none;min-height:34px}
+.cp-cr.hd span{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cp-muted);text-align:center}
+.cp-cr.hd span.pro{color:var(--cp-teal)}
+.cp-cr .lb{display:flex;align-items:center;gap:10px}
+.cp-fi.sm{width:22px;height:22px;border-radius:6px;margin:0}.cp-fi.sm svg{width:13px;height:13px}
+.cp-cr .v{display:grid;place-items:center}
+.cp-cr .v svg{width:16px;height:16px;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.cp-cr .v.n svg{stroke:#C3C7CB}
+.cp-cr .v.y svg{stroke:var(--cp-teal)}
+.cp-cr .v.pro{background:var(--cp-sel);align-self:stretch}
+.cp-oplan{height:auto;padding:12px 16px;flex-direction:row;justify-content:space-between;margin-top:16px}
+.cp-oplan .l{text-align:left}
+.cp-oplan .l small{display:block;font-size:12.5px;color:var(--cp-txt);margin-top:2px}
+.scr--offer .scr-foot{background:#fff;box-shadow:0 -10px 24px -14px rgba(0,0,0,.12)}
+
+/* tracking pre-prompt — their screen */
+.scr--att{background:#fff}
+.cp-att-art{display:block;width:240px;height:auto;margin:6px auto 0}
+.cp-att-h{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-align:center;color:#212121;margin:22px 20px 0}
+.cp-att-rows{display:flex;flex-direction:column;gap:20px;margin:30px 4px 0}
+.cp-att-r{display:flex;gap:18px;align-items:flex-start;font-size:16.5px;line-height:1.3;color:#2B2B2B}
+.cp-att-r svg{width:22px;height:22px;flex:none;stroke:#444;stroke-width:1.6;fill:none;margin-top:1px}
+.cp-sys{position:absolute;inset:0;z-index:40;background:rgba(0,0,0,.28);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.cp-sys.on{opacity:1;pointer-events:auto}
+.cp-dlg{width:270px;border-radius:14px;background:rgba(242,242,242,.97);overflow:hidden;text-align:center;transform:scale(1.08);transition:transform .2s}
+.cp-sys.on .cp-dlg{transform:none}
+.cp-dlg p{padding:18px 16px 16px;font-size:16px;font-weight:600;line-height:1.3;color:#000}
+.cp-dlg button{display:block;width:100%;height:44px;border-top:.5px solid rgba(60,60,67,.3);font-size:16.5px;color:#0A7AFF}
+
+/* dark mode — an approximation: no dark frames were supplied */
+.phone-in.dark{--cp-bg:#121417;--cp-card:#1D2126;--cp-line:#30353B;--cp-sel:#1C2A30;--cp-ink:#F1F3F4;--cp-ink2:#DADDE0;
+  --cp-txt:#A3AAB0;--cp-muted:#7D848B;--cp-soft:#1D2126;--cp-metal:#36383C;background:var(--cp-bg)}
+.phone-in.dark .screenwrap,.phone-in.dark .scr--use,.phone-in.dark .scr--att{background:var(--cp-bg)}
+.phone-in.dark .cp-use,.phone-in.dark .cp-plan,.phone-in.dark .cp-cmp,.phone-in.dark .scr--pay .scr-foot,.phone-in.dark .scr--offer .scr-foot{background:var(--cp-card)}
+.phone-in.dark .cp-use.on,.phone-in.dark .cp-plan.on,.phone-in.dark .cp-cr .v.pro{background:var(--cp-sel)}
+.phone-in.dark .cp-use svg,.phone-in.dark .cp-att-r svg{stroke:#C9CED2}
+.phone-in.dark .cp-att-h,.phone-in.dark .cp-att-r{color:var(--cp-ink)}
+.phone-in.dark .cp-back,.phone-in.dark .cp-x{background:#2A2E33;color:#E8EBED}
+.phone-in.dark .cp-shapes i{background:rgba(255,255,255,.03)}
+.phone-in.dark .cp-proof{background:rgba(255,255,255,.05)}
+.phone-in.dark .cp-press img{filter:invert(1) hue-rotate(180deg)}
+.phone-in.dark .cp-ft p em{background:#22343B;color:var(--cp-ink)}
+.phone-in.dark .cp-cr{border-color:#2A2F35}
+.phone-in.dark .cp-links{color:#B5BBC0}
+.phone-in.dark .cp-cr .v.n svg{stroke:#4A5057}
+.phone-in.dark .cp-btn[disabled]{background:#2B4048;color:#7E979F}
+.phone-in.dark .cp-metal{background:repeating-linear-gradient(180deg,rgba(255,255,255,.04) 0 1px,rgba(0,0,0,.08) 1px 2px),linear-gradient(180deg,#3A3C40,#303236)}
+.phone-in.dark .cp-hdr{color:#E2E4E6}.phone-in.dark .cp-hdr svg{stroke:#E2E4E6}
+.phone-in.dark .scr--try .scr-foot{background:linear-gradient(180deg,rgba(48,50,54,0),#303236 30%)}
+.phone-in.dark .cp-taskc{background:rgba(29,33,38,.9);color:var(--cp-ink)}
+.phone-in.dark .cp-dlg{background:rgba(44,44,46,.97)}.phone-in.dark .cp-dlg p{color:#fff}.phone-in.dark .cp-dlg button{border-color:rgba(84,84,88,.6);color:#0A84FF}
+.phone-in.dark .cp-sys{background:rgba(0,0,0,.5)}
+
+/* prototype toolbar, walkthrough, QR */
+.tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:520px}
+.seg{display:inline-flex;align-items:center;background:#fff;border:1px solid #E1E4E6;border-radius:20px;padding:3px;gap:2px}
+.seg button{padding:6px 11px;border-radius:16px;font:600 12px/1 -apple-system,'Inter',sans-serif;color:var(--ink2);transition:.14s}
+.seg button.on{background:var(--ink);color:#fff}
+.demo-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:20px;background:var(--accent);color:#fff;
+  font:700 12px/1 -apple-system,'Inter',sans-serif}
+.demo-cap{width:390px;max-width:calc(100vw - 24px);background:#fff;border:1px solid var(--hair);border-radius:16px;padding:14px 14px 12px;
+  display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;box-shadow:0 4px 18px rgba(35,35,33,.07)}
+.demo-cap .bar{position:absolute;left:0;top:0;right:0;height:3px;background:#EEF0F1}
+.demo-cap .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s linear}
+.demo-cap p{flex:1;font-size:13.5px;line-height:1.45;color:var(--ink);margin:0;font-weight:500}
+.demo-cap button{font:700 12px/1 -apple-system,'Inter',sans-serif;color:var(--ink2);padding:7px 10px;border-radius:12px;border:1px solid #E1E4E6;flex:none}
+.finger{position:absolute;z-index:90;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(35,35,33,.26);
+  border:2px solid rgba(255,255,255,.95);box-shadow:0 4px 14px rgba(0,0,0,.25);pointer-events:none;opacity:0;left:50%;top:60%;
+  transition:left .32s cubic-bezier(.4,0,.2,1),top .32s cubic-bezier(.4,0,.2,1),opacity .2s,transform .15s}
+.finger.show{opacity:1}
+.finger.press{transform:scale(.78);background:rgba(35,35,33,.4)}
+.qr{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--hair);border-radius:16px;padding:10px 16px 10px 10px;text-align:left}
+.qr img{width:135px;height:135px;display:block;image-rendering:pixelated;border-radius:6px}
+.qr span{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+.qr b{display:block;color:var(--ink);font-size:13.5px}
+@media(max-width:1080px){.qr{display:none}}
+
+#view-proto .tools{order:0} #view-proto .demo-cap{order:1} #view-proto .phone{order:2} #view-proto .chips{order:3}
+#view-proto .chiphint{order:4} #view-proto .qr{order:5}
+.cta-row .qr{order:2}
+/* on a phone: the prototype is the screen */
+@media(max-width:500px){
+  #view-proto .phonecol{padding:0 0 28px;gap:14px}
+  #view-proto .phone{width:100vw;height:calc(100svh - 58px);min-height:640px;border:0;border-radius:0;box-shadow:none;order:1}
+  #view-proto .phone-in{border-radius:0}
+  #view-proto .island,#view-proto .sbar,#view-proto .homebar{display:none}
+  #view-proto .scr-top{padding-top:14px}
+  #view-proto .scr-foot{padding-bottom:18px}
+  #view-proto .scr--pay .scr-top{padding-top:12px}
+  #view-proto .cp-pay-x{top:12px}
+  #view-proto .scr--home .scr-top{padding-top:0}
+  #view-proto .scr--pay .scr-foot{padding-bottom:16px}
+  #view-proto .tools{order:3;padding:0 12px}
+  #view-proto .demo-cap{position:fixed;left:12px;right:12px;bottom:12px;width:auto;max-width:none;z-index:95}
+  #view-proto .chips{order:4;padding:0 12px}
+  #view-proto .chiphint{order:5}
+}
+
+/* overview: walkthrough button */
+.herobtns{display:flex;justify-content:center;margin-top:30px}
+.ghostbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--hair2);color:var(--ink);font-size:14px;
+  font-weight:700;padding:9px 20px 9px 9px;border-radius:30px;box-shadow:0 2px 12px rgba(35,35,33,.06);transition:.16s}
+.ghostbtn:hover{box-shadow:0 4px 18px rgba(35,35,33,.1)}
+.ghostbtn .pl{width:30px;height:30px;border-radius:50%;background:var(--accent);display:grid;place-items:center}
+.ghostbtn .pl svg{width:12px;height:12px;fill:#fff;margin-left:2px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:470px;margin:0 auto}
+.chip{padding:7px 13px;border-radius:20px;border:1px solid #E1E4E6;background:#fff;
+  font:600 12px/1 -apple-system,'Inter',sans-serif;color:var(--ink2);transition:.14s}
+.chip:hover{color:var(--ink);border-color:#C9CED2}
+.chip.offer{border-style:dashed;border-color:var(--accent);color:var(--accent-lift)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;border-style:solid}
+.chiphint{text-align:center;font-size:11px;color:var(--ink3);margin:0;max-width:430px}
+
+/* ============ the short panel ============ */
+.pn{padding:30px 30px 60px}
+.pn-n{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.pn-n.ctx{color:var(--panel-muted)}
+.pn-t{font-size:23px;line-height:1.18;font-weight:700;letter-spacing:-.028em;margin:8px 0 0;color:var(--panel-ink)}
+.pn-hyp{font-size:15px;line-height:1.62;color:#2E353B;margin:16px 0 0}
+.pn-hyp b{font-weight:700;color:var(--panel-ink)}
+.pn-out{margin-top:22px;border-top:1px solid var(--panel-line);padding-top:18px}
+.pn-out .lab{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--panel-muted)}
+.pn-out .v{font-size:31px;font-weight:700;letter-spacing:-.035em;color:var(--accent-ink);margin-top:7px;line-height:1}
+.pn-kept{margin-top:22px;font-size:12.5px;line-height:1.55;color:var(--panel-muted)}
+.pn-kept b{color:#2E353B;font-weight:700}
+.pn-foot{font-size:11.5px;line-height:1.55;color:var(--panel-muted);border-top:1px solid var(--panel-line);
+  padding-top:14px;margin-top:26px}
+.pn-sep{height:1px;background:var(--panel-line);margin:26px 0}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-in">
+    <div class="nav-brand">
+      <span class="mk"><img src="img/app-icon.png" alt="Calculator Plus"></span>
+      <b>Growth Audit</b><span>· Calculator Plus</span>
+    </div>
+    <div class="nav-links">
+      <button class="on" data-view="over">Overview</button>
+      <button data-view="proto">Prototype</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= OVERVIEW ======================= -->
+<div class="view on" id="view-over">
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Growth Audit · October 2026</div>
+    <h1>Calculator Plus</h1>
+    <p class="lede">Five ideas to unlock more revenue from the traffic you already have.</p>
+    <div class="meta">Prepared for <b>DigitAlchemy</b> by <b>Adapty</b> · based on your live iOS flow and your App Store listing</div>
+    <div class="herobtns"><button class="ghostbtn" data-demo><span class="pl"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg></span>Watch the 30-second walkthrough</button></div>
+    <div class="stats">
+      <div class="stat"><b>30,000+</b><span>apps run subscriptions<br>on Adapty</span></div>
+      <div class="stat"><b>5</b><span>ideas, each rebuilt<br>as a working screen</span></div>
+      <div class="stat"><b>0</b><span>design changes<br>to your art direction</span></div>
+    </div>
+
+    <div class="fb">
+      <div class="fb-k">Built in Adapty Flow Builder</div>
+      <div class="fb-i">
+        <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <p><b>Millions of dollars</b> in subscription revenue pass through Flow Builder every month.</p>
+      </div>
+      <div class="fb-i">
+        <span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <p><b>Nearly 500 apps</b> actively build their paywalls and onboarding in it — plenty of them past $100K MRR.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="wrap">
+    <div class="sec-k">What this is</div>
+    <h2>We opened Calculator Plus the way a new user does, then rebuilt the parts we think are leaving money on the table.</h2>
+    <p class="body">Adapty powers subscriptions for <b>30,000+ apps</b>, so we get to see what actually moves conversion and ARPU across the market rather than inside one app. We pointed that at Calculator Plus: installed it, went through the first screens, read your App Store listing and screenshots, and looked for gaps between what you already have and what you currently show people.</p>
+    <p class="body">What follows is five ideas — not fifteen. Each one is a hypothesis you can A/B test, and each one is built into a clickable prototype so you can see it rather than imagine it. <b>The prototype uses your design, not ours.</b></p>
+
+    <div class="notes">
+      <div class="note">
+        <h4>We did not redesign your app</h4>
+        <p>Every screen in the prototype is yours — your brushed-metal keypad and blue display, your plan tiles and Save 60% badge, your tracking screen. Only the order changed, plus a few things you already own but do not show at the right moment. This is not a design pitch.</p>
+      </div>
+      <div class="note">
+        <h4>You may have tested some of this</h4>
+        <p>We are working from the outside, so we cannot see your experiment history. If one of these is something you have already run, tell us — we will go deeper on the rest rather than repeat it.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<div class="sec">
+  <div class="wrap">
+    <div class="sec-k">The five ideas</div>
+    <h2>Ranked by what we would test first.</h2>
+    <p class="body">Each one links straight to the screen in the prototype.</p>
+
+    <div class="ideas">
+      <button class="idea" data-jump="offer">
+        <span class="no">01</span>
+        <span>
+          <h3>Offer the one-time 14,99 € when they close</h3>
+          <p>Today the X on the paywall drops people straight into the calculator. Your Forever plan at 14,99 € is a real App Store price with no subscription attached, and it is what someone who just turned down 1,99 € a month may still say yes to.</p>
+          <span class="seeit">See the screen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+        <span class="out"><b>ARPU +10–15%</b><span>second chance</span></span>
+      </button>
+
+      <button class="idea" data-jump="try">
+        <span class="no">02</span>
+        <span>
+          <h3>Let them calculate before the price</h3>
+          <p>A new install sees a tracking request and then the paywall. Nobody has pressed a single key yet. One real sum on your own keypad, before the price, shows the app is worth keeping.</p>
+          <span class="seeit">See the screen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+        <span class="out"><b>CR +10–20%</b><span>to purchase</span></span>
+      </button>
+
+      <button class="idea" data-jump="att">
+        <span class="no">03</span>
+        <span>
+          <h3>Ask about tracking after the paywall</h3>
+          <p>“Allow tracking on the next screen” and Apple’s dialog are the first two things a new user sees, right before the price. Move them one step later, past the paywall, still in the first session.</p>
+          <span class="seeit">See the screen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+        <span class="out"><b>CR +10–15%</b><span>to purchase</span></span>
+      </button>
+
+      <button class="idea" data-jump="use">
+        <span class="no">04</span>
+        <span>
+          <h3>Name what they calculate on the paywall</h3>
+          <p>Everyone sees the same four features in the same order. Ask one question — shopping, tax, budget, school or work — and let the answer choose the line under your wordmark, the first feature, and the sum they just did.</p>
+          <span class="seeit">See the screen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+        <span class="out"><b>CR +15–20%</b><span>to purchase</span></span>
+      </button>
+
+      <button class="idea" data-jump="paywall">
+        <span class="no">05</span>
+        <span>
+          <h3>Put your 4.8 and your press logos on the paywall</h3>
+          <p>Your App Store screenshots carry 25K+ five-star ratings, 2 million installs and the NBC, ABC, Good Morning America, Gizmodo and GeekWire logos. The paywall shows none of it.</p>
+          <span class="seeit">See the screen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+        <span class="out"><b>CR +10–15%</b><span>to purchase</span></span>
+      </button>
+    </div>
+
+    <div class="band">
+      <div class="txt">
+        <div class="lab">Potential outcome</div>
+        <p>Run together, these five change three moments: what a new user sees first, what the paywall says to them, and what happens when they say no.</p>
+      </div>
+      <div class="nums">
+        <div><b>+25%</b><span>CR to purchase</span></div>
+        <div><b>+30%</b><span>ARPU</span></div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <div class="qr"><img src="img/qr.svg?v=1" alt="QR code for the prototype"><span><b>Or open it on your phone</b>Scan to try the flow in your hand.</span></div>
+      <button class="bigbtn" data-view="proto">Open the prototype
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <div class="wrap">
+    Impact ranges are Adapty's expected effect from teardowns and A/B tests across subscription apps — not measured lift for Calculator Plus. Every price, rating, press logo and feature line here and in the prototype comes from Calculator Plus’s own App Store listing, App Store screenshots and in-app screens.
+  </div>
+</div>
+</div><!-- /view-over -->
+
+<!-- ======================= PROTOTYPE ======================= -->
+<div class="view" id="view-proto">
+<div class="stage">
+  <div class="phonecol">
+    <div class="tools" id="tools">
+      <div class="seg" id="segLang"><button data-lang="en" class="on">EN</button><button data-lang="de">DE</button><button data-lang="fr">FR</button></div>
+      <div class="seg" id="segTheme"><button data-theme="light" class="on">Light</button><button data-theme="dark">Dark</button></div>
+      <button class="demo-btn" id="demoBtn"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>30-sec walkthrough</button>
+    </div>
+    <div class="phone">
+      <div class="phone-in" id="phoneIn">
+        <div class="island"></div>
+        <div class="sbar" id="sbar">
+          <span>9:41</span>
+          <span class="glyphs">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7.5" width="3" height="3.5" rx="1"/><rect x="4.5" y="5.5" width="3" height="5.5" rx="1"/><rect x="9" y="3" width="3" height="8" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 10.5 5.6 7.9a3.4 3.4 0 0 1 4.8 0L8 10.5Zm0-5.6a6.4 6.4 0 0 0-4.5 1.9L1.7 4.9a9 9 0 0 1 12.6 0l-1.8 1.9A6.4 6.4 0 0 0 8 4.9Z"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".6" y=".6" width="20" height="10.8" rx="3" stroke="currentColor" stroke-opacity=".5"/><rect x="2.2" y="2.2" width="16.5" height="7.6" rx="1.8" fill="currentColor"/><path d="M22.3 4.1v3.8a2 2 0 0 0 0-3.8Z" fill="currentColor" fill-opacity=".5"/></svg>
+          </span>
+        </div>
+        <div class="homebar" id="homebar"></div>
+        <div class="finger" id="finger"></div>
+        <div class="screenwrap">
+
+<!-- SPLASH -->
+<section class="scr scr--splash" data-id="splash" data-light="1">
+  <div class="cp-splash"><img src="img/splash-icon.png" alt="Calculator Plus"></div>
+</section>
+
+<!-- USE -->
+<section class="scr scr--use" data-id="use">
+  <div class="scr-top">
+    <h2 class="cp-h" style="margin-top:22px" data-th="use.h"></h2>
+    <p class="cp-sub" data-t="use.sub"></p>
+  </div>
+  <div class="scr-body"><div class="cp-uses" id="useList"></div><div style="height:12px"></div></div>
+  <div class="scr-foot"><button class="cp-btn" data-go="try" data-t="cont"></button></div>
+</section>
+
+<!-- TRY IT -->
+<section class="scr scr--calc scr--try" data-id="try">
+  <div class="cp-metal"></div>
+  <div class="scr-top" style="padding-left:16px;padding-right:16px">
+    <div class="cp-task">
+      <button class="cp-back" data-back aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="cp-taskc" id="taskCard"><small id="taskK"></small><span id="taskT"></span></div>
+    </div>
+  </div>
+  <div class="scr-body" style="padding:12px 16px 0">
+    <div class="cp-lcd" id="lcdTry"><div class="mn"></div><div class="ln"></div><div class="sb"></div><span class="hd"></span></div>
+    <div class="cp-pad" id="padTry"></div>
+  </div>
+  <div class="scr-foot" style="padding-left:16px;padding-right:16px"><button class="cp-btn" id="tryBtn" data-go="paywall" data-t="cont"></button></div>
+</section>
+
+<!-- PAYWALL -->
+<section class="scr scr--pay" data-id="paywall">
+  <div class="cp-shapes"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+  <button class="cp-x cp-pay-x" id="payClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <div class="scr-top">
+    <img class="cp-icon" src="img/pro-icon-a.png" alt="">
+    <div class="cp-wm">Calculator Plus <em>PRO</em></div>
+    <p class="cp-for" id="payFor"></p>
+  </div>
+  <div class="scr-body">
+    <div class="cp-proof">
+      <div class="cp-rate"><b id="rateV"></b><span>★★★★★</span><small id="rateN"></small></div>
+      <div class="cp-press"><small data-t="pw.seen"></small><img src="img/press-a.png" alt="NBC, ABC, Good Morning America, Gizmodo, GeekWire"></div>
+    </div>
+    <div class="cp-feats" id="featList"></div>
+  </div>
+  <div class="scr-foot">
+    <div class="cp-plans" id="planList">
+      <button class="cp-plan" data-v="month"><span class="t" data-t="pl.m"></span><span class="p">1,99 €</span></button>
+      <button class="cp-plan" data-v="year"><span class="cp-save" data-t="pl.save"></span><span class="t" data-t="pl.y"></span><span class="p">9,99 €</span><s>23,88 €</s></button>
+      <button class="cp-plan" data-v="life"><span class="t" data-t="pl.f"></span><span class="p">14,99 €</span></button>
+    </div>
+    <p class="cp-help" id="payHelp"></p>
+    <p class="cp-legal" id="payLegal"></p>
+    <button class="cp-btn b" id="payCta"></button>
+    <div class="cp-links"><a>EULA</a><span>·</span><a data-t="lg.priv"></a><span>·</span><a data-t="lg.rest"></a></div>
+  </div>
+</section>
+
+<!-- OFFER ON CLOSE -->
+<section class="scr scr--offer sheet" data-id="offer">
+  <div class="cp-shapes"><i class="a"></i><i class="c"></i></div>
+  <button class="cp-x cp-pay-x" id="offClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <div class="scr-top">
+    <img class="cp-icon" src="img/pro-icon-a.png" alt="" style="width:62px;height:62px">
+    <div class="cp-ok" data-t="of.k"></div>
+    <h2 class="cp-oh" data-th="of.h"></h2>
+    <p class="cp-os" data-t="of.s"></p>
+  </div>
+  <div class="scr-body"><div class="cp-cmp" id="cmpTable"></div><div style="height:12px"></div></div>
+  <div class="scr-foot">
+    <button class="cp-plan on cp-oplan" style="width:100%;margin-top:0"><span class="l"><span class="t" data-t="pl.f"></span><small data-t="of.once"></small></span><span class="p">14,99 €</span></button>
+    <p class="cp-legal" style="margin-top:10px" data-t="lg.f"></p>
+    <button class="cp-btn b" id="offerCta" data-t="cta.f"></button>
+    <button class="cp-ghost" id="offerNo" data-t="of.no"></button>
+  </div>
+</section>
+
+<!-- TRACKING (their screen, moved after the paywall) -->
+<section class="scr scr--att" data-id="att">
+  <div class="scr-top"></div>
+  <div class="scr-body">
+    <img class="cp-att-art" src="img/att-art-a.png" alt="">
+    <h2 class="cp-att-h" data-t="att.h"></h2>
+    <div class="cp-att-rows">
+      <div class="cp-att-r"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg><span data-t="att.r1"></span></div>
+      <div class="cp-att-r"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span data-t="att.r2"></span></div>
+    </div>
+  </div>
+  <div class="scr-foot">
+    <div class="cp-softcard" data-t="att.card"></div>
+    <button class="cp-btn" id="attBtn" data-t="cont"></button>
+  </div>
+  <div class="cp-sys" id="attSys"><div class="cp-dlg"><p data-t="sys.h"></p><button id="sysNo" data-t="sys.no"></button><button id="sysYes" data-t="sys.yes"></button></div></div>
+</section>
+
+<!-- HOME -->
+<section class="scr scr--calc scr--home" data-id="home">
+  <div class="cp-metal"></div>
+  <div class="scr-top" style="padding-left:16px;padding-right:16px">
+    <button class="cp-banner" id="homeBanner"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 1.8l2.5 7.1 7.5.2-6 4.6 2.2 7.2L12 16.6l-6.2 4.3L8 13.7 2 9.1l7.5-.2z"/></svg><span data-t="home.ban"></span><svg class="ch" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    <div class="cp-hdr"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg><span>CALCULATOR<b>PLUS</b><b id="homePro" class="hidden" style="color:var(--cp-teal)"> PRO</b></span></div>
+  </div>
+  <div class="scr-body" style="padding:0 16px">
+    <div class="cp-lcd" id="lcdHome"><div class="mn"></div><div class="ln"></div><div class="sb"></div><span class="hd"></span></div>
+    <div class="cp-pad" id="padHome"></div>
+  </div>
+  <div class="scr-foot" style="padding:0 0 22px"></div>
+</section>
+
+        </div>
+      </div>
+    </div>
+    <div class="demo-cap hidden" id="demoCap"><div class="bar"><i id="demoProg"></i></div><p id="demoTxt"></p><button id="demoStop">Stop</button></div>
+    <div class="chips" id="chips"></div>
+    <p class="chiphint">Jump to any screen — answers already filled in.</p>
+    <div class="qr"><img src="img/qr.svg?v=1" alt="QR code for this prototype"><span><b>Open it on your phone</b>Scan to try the flow in your hand.</span></div>
+  </div>
+  <div class="panelcol"><div class="pn" id="panel"></div></div>
+</div>
+</div><!-- /view-proto -->
+
+<script>
+/* ================= copy, per language (phone screens only) ================= */
+var LANGS = ['en','de','fr'];
+var T = {
+ 'cont':    ["Continue","Weiter","Continuer"],
+ 'use.h':   ["What will you use<br>Calculator Plus for?","Wofür nutzt du<br>Calculator Plus?","Pour quoi utiliserez-vous<br>Calculator Plus ?"],
+ 'use.sub': ["Pick one — we’ll show you how it works for that.","Wähle eins – wir zeigen dir, wie es dafür funktioniert.","Choisissez-en un : on vous montre comment ça marche."],
+ 'try.k':   ["Try it","Probier’s aus","Essayez"],
+ 'try.tap': ["{q} Tap <b>=</b>","{q} Tippe auf <b>=</b>","{q} Touchez <b>=</b>"],
+ 'try.done':["Saved to History","Im Verlauf gespeichert","Enregistré dans l’historique"],
+ 'try.res': ["{e} = <b>{r}</b>","{e} = <b>{r}</b>","{e} = <b>{r}</b>"],
+ 'pw.seen': ["As seen on","Bekannt aus","Vu sur"],
+ 'pl.m':    ["Monthly","Monatlich","Mensuel"],
+ 'pl.y':    ["Annual","Jährlich","Annuel"],
+ 'pl.f':    ["Forever","Für immer","À vie"],
+ 'pl.save': ["Save 60%","60 % sparen","−60 %"],
+ 'h.m':     ["7 days free, then 1,99 €/month","7 Tage gratis, dann 1,99 €/Monat","7 jours gratuits, puis 1,99 €/mois"],
+ 'h.y':     ["7 days free, then 9,99 €/year","7 Tage gratis, dann 9,99 €/Jahr","7 jours gratuits, puis 9,99 €/an"],
+ 'h.f':     ["Pay once — use forever","Einmal zahlen – für immer nutzen","Payez une fois, utilisez à vie"],
+ 'lg.t':    ["You will pay nothing if you cancel within 7 days. After the trial period, the subscription will automatically renew. You may cancel renewal at any time.","Du zahlst nichts, wenn du innerhalb von 7 Tagen kündigst. Nach der Testphase verlängert sich das Abo automatisch. Du kannst die Verlängerung jederzeit kündigen.","Vous ne payez rien si vous annulez sous 7 jours. Après l’essai, l’abonnement se renouvelle automatiquement. Vous pouvez annuler le renouvellement à tout moment."],
+ 'lg.f':    ["Once you have made the purchase, you'll unlock all the advanced features forever, without having to pay anything else.","Nach dem Kauf schaltest du alle erweiterten Funktionen für immer frei, ohne weitere Kosten.","Après l’achat, toutes les fonctions avancées sont débloquées à vie, sans rien payer de plus."],
+ 'cta.t':   ["Try for free","Gratis testen","Essai gratuit"],
+ 'cta.f':   ["Get PRO","PRO holen","Obtenir PRO"],
+ 'lg.priv': ["Privacy Policy","Datenschutz","Confidentialité"],
+ 'lg.rest': ["Restore Purchases","Käufe wiederherstellen","Restaurer les achats"],
+ 'ft.notes':["Your {e} is already in History. Add a note to it.","Deine Rechnung {e} ist schon im Verlauf. Füge eine Notiz hinzu.","Votre calcul {e} est déjà dans l’historique. Ajoutez-y une note."],
+ 'of.k':    ["Before you go","Bevor du gehst","Avant de partir"],
+ 'of.h':    ["Pay once — use forever","Einmal zahlen –<br>für immer nutzen","Payez une fois,<br>utilisez à vie"],
+ 'of.s':    ["No subscription. One payment of 14,99 €.","Kein Abo. Einmalig 14,99 €.","Sans abonnement. Un seul paiement de 14,99 €."],
+ 'of.free': ["Free","Gratis","Gratuit"],
+ 'of.once': ["One-time purchase","Einmalkauf","Achat unique"],
+ 'of.no':   ["Not now","Jetzt nicht","Pas maintenant"],
+ 'att.h':   ["Allow tracking on the next screen","Erlaube Tracking auf dem nächsten Bildschirm","Autorisez le suivi à l’écran suivant"],
+ 'att.r1':  ["Support the app and help us keep it free","Unterstütze die App und hilf uns, sie kostenlos zu halten","Soutenez l’app et aidez-nous à la garder gratuite"],
+ 'att.r2':  ["Get personalized ads that better suit your interests","Erhalte personalisierte Werbung, die besser zu deinen Interessen passt","Recevez des publicités personnalisées, mieux adaptées à vos intérêts"],
+ 'att.card':["You can change this later in the Settings app","Du kannst das später in der Einstellungen-App ändern","Vous pourrez modifier ce choix plus tard dans Réglages"],
+ 'sys.h':   ["Allow “Calculator Plus” to track your activity across other companies’ apps and websites?","Darf „Calculator Plus“ deine Aktivitäten in Apps und auf Websites anderer Firmen erfassen?","Autoriser « Calculator Plus » à suivre vos activités dans les apps et sur les sites web d’autres sociétés ?"],
+ 'sys.no':  ["Ask App Not to Track","App bitten, kein Tracking durchzuführen","Demander à l’app de ne pas me suivre"],
+ 'sys.yes': ["Allow","Erlauben","Autoriser"],
+ 'home.ban':["Unlock more features with PRO","Mehr Funktionen mit PRO","Plus de fonctions avec PRO"]
+};
+/* store proof per storefront: App Store listing, October 2026 */
+var RATE = { en:['4.8','5.1K ratings'], de:['4,7','2.200 Bewertungen'], fr:['4,7','620 notes'] };
+var LOCALE = { en:'de-DE', de:'de-DE', fr:'fr-FR' };   /* their EUR screens use a decimal comma in English too */
+
+var ICON = {
+  shop:  '<path d="M3.5 12.5 12 4h7.5v7.5L11 20z"/><circle cx="16" cy="8" r="1.4"/>',
+  tax:   '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9.5 13.5l5-5"/><circle cx="9.7" cy="8.7" r=".9"/><circle cx="14.3" cy="13.3" r=".9"/>',
+  budget:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M16 14.5h2"/><path d="M6 6V4.5h11V6"/>',
+  school:'<path d="M2.5 8.5 12 4l9.5 4.5L12 13z"/><path d="M6.5 10.5v4.5c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.5"/>',
+  work:  '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5h6v2"/><path d="M3 12.5h18"/>'
+};
+var USES = [
+ {k:'shop',  l:['Shopping, discounts & tips','Einkaufen, Rabatte & Trinkgeld','Courses, remises et pourboires'],
+  f:['Discounts, tips and tax worked out in one tap','Rabatte, Trinkgeld und Steuern mit einem Tipp','Remises, pourboires et taxes en un geste'],
+  q:['How much is 59,90 € with 20% off?','Was kostet 59,90 € mit 20 % Rabatt?','Combien coûte 59,90 € avec 20 % de remise ?'],
+  tk:[['59.90','−','20%']], ord:['tax','notes','widgets','gt','ads']},
+ {k:'tax',   l:['Tax & VAT','Steuern & MwSt.','Taxes et TVA'],
+  f:['Add or remove VAT in one tap with TAX+/TAX-','MwSt. mit TAX+/TAX- drauf- oder rausrechnen','Ajoutez ou retirez la TVA avec TAX+/TAX-'],
+  q:['What is 120 € plus 20% VAT?','Was sind 120 € plus 19 % MwSt.?','Combien font 120 € plus 20 % de TVA ?'],
+  tk:[['120','+','20%'],['120','+','19%'],['120','+','20%']], ord:['tax','gt','notes','widgets','ads']},
+ {k:'budget',l:['Budget, bills & expenses','Budget, Rechnungen & Ausgaben','Budget, factures et dépenses'],
+  f:['Every bill and total, kept with a note','Jede Rechnung und Summe, mit Notiz gespeichert','Chaque facture et total, gardés avec une note'],
+  q:['What’s left of 1.250 € after 389,90 € rent?','Was bleibt von 1.250 € nach 389,90 € Miete?','Que reste-t-il de 1 250 € après 389,90 € de loyer ?'],
+  tk:[['1250','−','389.90']], ord:['notes','gt','widgets','tax','ads']},
+ {k:'school',l:['School & homework','Schule & Hausaufgaben','École et devoirs'],
+  f:['Homework, checked step by step in History','Hausaufgaben, Schritt für Schritt im Verlauf geprüft','Les devoirs, vérifiés étape par étape dans l’historique'],
+  q:['What is 144 ÷ 12?','Was ist 144 ÷ 12?','Combien font 144 ÷ 12 ?'],
+  tk:[['144','÷','12']], ord:['notes','widgets','gt','tax','ads']},
+ {k:'work',  l:['Work & business','Arbeit & Business','Travail et business'],
+  f:['Quotes and invoices, with tax and grand totals','Angebote und Rechnungen, mit Steuer und Gesamtsumme','Devis et factures, avec taxes et totaux'],
+  q:['3 days at 1.850 € a day?','3 Tage zu je 1.850 €?','3 jours à 1 850 € par jour ?'],
+  tk:[['1850','×','3']], ord:['tax','gt','notes','widgets','ads']}
+];
+var USEK={}; USES.forEach(function(u){ USEK[u.k]=u; });
+/* the four PRO features on their paywall, plus “no ads” from their App Store purchase lines */
+var FEAT = {
+  widgets:{c:'var(--cp-f-green)', i:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>',
+    t:['Widgets','Widgets','Widgets'], d:['Calculate on the go without opening the app','Unterwegs rechnen, ohne die App zu öffnen','Calculez en déplacement sans ouvrir l’app']},
+  notes:{c:'var(--cp-f-orange)', i:'<path d="M5 5h14v10.5H10L6 19v-3.5H5z"/><path d="M8.5 9h7M8.5 12h4.5"/>',
+    t:['Notes','Notizen','Notes'], d:['Add notes to calculations listed in History','Notizen zu Rechnungen im Verlauf hinzufügen','Ajoutez des notes aux calculs de l’historique']},
+  tax:{c:'var(--cp-f-pink)', i:'<path d="M6.5 17.5l11-11"/><circle cx="7.5" cy="7.5" r="2.2"/><circle cx="16.5" cy="16.5" r="2.2"/>',
+    t:['TAX function','TAX-Funktion','Fonction TAX'], d:['Make tax calculations easily with TAX+/TAX-','Steuern einfach berechnen mit TAX+/TAX-','Calculez les taxes facilement avec TAX+/TAX-']},
+  gt:{c:'var(--cp-f-blue)', i:'<path d="M5 6.5h14M5 12h14"/><path d="M5 17.5h7"/><path d="M15.5 15.5v4M13.5 17.5h4"/>',
+    t:['GT function','GT-Funktion','Fonction GT'], d:['Add up all your results with Grand Total','Alle Ergebnisse mit Grand Total addieren','Additionnez tous vos résultats avec Grand Total']},
+  ads:{c:'var(--cp-f-slate)', i:'<circle cx="12" cy="12" r="8"/><path d="M6.5 6.5l11 11"/>',
+    t:['No ads','Keine Werbung','Sans publicité'], d:['Premium features and no ads','Premium-Funktionen und keine Werbung','Fonctions premium et aucune publicité']}
+};
+var CMP = ['ads','widgets','notes','tax','gt'];
+
+/* ================= state ================= */
+var S0 = {lang:'en', theme:'light'};
+function defaults(){ return { lang:S0.lang, theme:S0.theme, use:'shop', plan:'year', bought:false, last:null }; }
+var S = defaults();
+function L(){ return LANGS.indexOf(S.lang); }
+function t(k,v){ var s=(T[k]||[k])[L()]; if(v) Object.keys(v).forEach(function(x){ s=s.split('{'+x+'}').join(v[x]); }); return s; }
+function U(){ return USEK[S.use]; }
+function taskTokens(){ var tk=U().tk; return (tk[L()]||tk[0]).slice(); }
+
+/* ================= the calculator — a working one, in their skin ================= */
+var KEYS = [['mc','mem'],['m+','mem'],['m-','mem'],['mr','mem'],
+  ['AC','ac'],['%','op'],['±','op sm'],['÷','op'],
+  ['7',''],['8',''],['9',''],['×','op'],
+  ['4',''],['5',''],['6',''],['−','op'],
+  ['1',''],['2',''],['3',''],['+','op'],
+  ['0',''],[',',''],['⌫',''],['=','eq']];
+var BKSP='<svg viewBox="0 0 34 26"><path d="M11 2h20a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H11L1 13z" fill="#1D1D1D"/><path d="M15.5 8.5l9 9M24.5 8.5l-9 9" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
+function isOp(x){ return x==='+'||x==='−'||x==='×'||x==='÷'; }
+function nf(n){ return new Intl.NumberFormat(LOCALE[S.lang],{maximumFractionDigits:8}).format(n); }
+function fmtTok(s){ /* format a number token as it is being typed */
+  if(isOp(s)) return s;
+  var pct=/%$/.test(s), neg=s[0]==='-', b=s.replace(/[-%]/g,''), p=b.split('.');
+  var ip=new Intl.NumberFormat(LOCALE[S.lang]).format(Number(p[0]||0));
+  var dec=LOCALE[S.lang]==='fr-FR'?',':',';
+  return (neg?'−':'')+ip+(p.length>1?dec+p[1]:'')+(pct?'%':''); }
+function render(tk){ return tk.map(fmtTok).join(''); }
+function num(s){ return Number(s.replace('%','')); }
+function evalT(tk){
+  var v=tk.slice();
+  for(var i=0;i<v.length;i+=2){ if(/%$/.test(v[i])){ var p=num(v[i]), op=v[i-1];
+    v[i]=String((op==='+'||op==='−') ? evalT(tk.slice(0,i-1))*p/100 : p/100); } }
+  var terms=[Number(v[0])], ops=[];
+  for(var j=1;j<v.length;j+=2){ var o=v[j], n=Number(v[j+1]);
+    if(o==='×') terms[terms.length-1]*=n; else if(o==='÷') terms[terms.length-1]= n===0?NaN:terms[terms.length-1]/n;
+    else { ops.push(o); terms.push(n); } }
+  var r=terms[0]; ops.forEach(function(o,k){ r = o==='+' ? r+terms[k+1] : r-terms[k+1]; });
+  return parseFloat(r.toPrecision(12)); }
+function Calc(lcd,pad,onEq){
+  var c={tk:['0'],done:false,res:0,sub:'',mem:0,lcd:lcd,pad:pad,onEq:onEq};
+  pad.innerHTML=KEYS.map(function(k){ return '<button class="ck '+k[1]+'" data-k="'+k[0]+'">'+(k[0]==='⌫'?BKSP:k[0]==='±'?'+/−':k[0])+'</button>'; }).join('');
+  pad.addEventListener('click',function(e){ var b=e.target.closest('.ck'); if(b) press(c,b.dataset.k); });
+  return c; }
+function cur(c){ return c.done ? String(c.res) : (isOp(c.tk[c.tk.length-1]) ? '0' : c.tk[c.tk.length-1]); }
+function press(c,k){
+  var tk=c.tk, last=tk[tk.length-1];
+  if(/^[0-9]$/.test(k)){
+    if(c.done){ c.tk=[k]; c.done=false; c.sub=''; }
+    else if(isOp(last)) tk.push(k);
+    else if(/%$/.test(last)) { tk.push('×'); tk.push(k); }
+    else if(last==='0') tk[tk.length-1]=k;
+    else if(last==='-0') tk[tk.length-1]='-'+k;
+    else if(last.replace(/[-.]/g,'').length<12) tk[tk.length-1]=last+k;
+  } else if(k===','){
+    if(c.done){ c.tk=['0.']; c.done=false; c.sub=''; }
+    else if(isOp(last)) tk.push('0.');
+    else if(last.indexOf('.')<0 && !/%$/.test(last)) tk[tk.length-1]=last+'.';
+  } else if(isOp(k)){
+    if(c.done){ c.tk=[String(c.res),k]; c.done=false; }
+    else if(isOp(last)) tk[tk.length-1]=k; else tk.push(k);
+  } else if(k==='%'){
+    if(!c.done && !isOp(last) && !/%$/.test(last)) tk[tk.length-1]=last+'%';
+  } else if(k==='±'){
+    if(c.done){ c.tk=[String(-c.res)]; c.done=false; }
+    else if(!isOp(last)) tk[tk.length-1]= last[0]==='-'?last.slice(1):'-'+last;
+  } else if(k==='⌫'){
+    if(c.done) return paint(c);
+    var s=last.slice(0,-1); if(s===''||s==='-'){ if(tk.length>1) tk.pop(); else tk[0]='0'; } else tk[tk.length-1]=s;
+  } else if(k==='AC'){ c.tk=['0']; c.done=false; c.sub='';
+  } else if(k==='='){
+    if(c.done) return;
+    if(isOp(last)) tk.pop();
+    if(tk.length<3){ return paint(c); }
+    var e=render(tk); c.res=evalT(tk); c.sub=e; c.done=true;
+    if(c.onEq) c.onEq(e,c.res);
+  } else if(k==='mc'){ c.mem=0; } else if(k==='m+'){ c.mem+=Number(cur(c).replace('%','')); } else if(k==='m-'){ c.mem-=Number(cur(c).replace('%','')); }
+  else if(k==='mr'){ var m=String(c.mem); if(c.done){ c.tk=[m]; c.done=false; c.sub=''; } else if(isOp(last)) tk.push(m); else tk[tk.length-1]=m; }
+  paint(c);
+}
+function paint(c){
+  var mn=c.lcd.querySelector('.mn'), txt=c.done ? (isNaN(c.res)?'Error':nf(c.res)) : render(c.tk);
+  mn.textContent=txt;
+  var base=c.lcd.parentNode.parentNode.classList.contains('scr--try')?44:52, len=txt.length;
+  mn.style.fontSize=(len>9 ? Math.max(24,Math.round(base*9/len)) : base)+'px';
+  c.lcd.querySelector('.sb').textContent = c.done ? c.sub : (c.mem ? 'm = '+nf(c.mem) : '');
+}
+var calcTry=Calc(document.getElementById('lcdTry'),document.getElementById('padTry'),function(e,r){ S.last={e:e,r:r}; syncScreen(); });
+var calcHome=Calc(document.getElementById('lcdHome'),document.getElementById('padHome'),function(e,r){ S.last={e:e,r:r}; });
+function presetTry(){ calcTry.tk=taskTokens(); calcTry.done=false; calcTry.sub=''; paint(calcTry); }
+
+/* ================= builders (re-run on language change) ================= */
+function buildUses(){ var g=document.getElementById('useList'); g.innerHTML='';
+  USES.forEach(function(u){ var b=document.createElement('button'); b.className='cp-use'; b.dataset.v=u.k;
+    b.innerHTML='<svg viewBox="0 0 24 24">'+ICON[u.k]+'</svg><span>'+u.l[L()]+'</span><span class="rd"><i></i></span>';
+    b.addEventListener('click',function(){ if(S.use!==u.k){ S.use=u.k; S.last=null; presetTry(); } syncScreen(); });
+    g.appendChild(b); }); }
+var ck='<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>', xk='<svg viewBox="0 0 24 24"><path d="M17 7 7 17M7 7l10 10"/></svg>';
+function buildCmp(){ var li=L();
+  var h='<div class="cp-cr hd"><span></span><span>'+t('of.free')+'</span><span class="pro">PRO</span></div>';
+  CMP.forEach(function(k){ var f=FEAT[k];
+    h+='<div class="cp-cr"><span class="lb"><span class="cp-fi sm" style="background:'+f.c+'"><svg viewBox="0 0 24 24">'+f.i+'</svg></span>'+f.t[li]+'</span><span class="v n">'+xk+'</span><span class="v y pro">'+ck+'</span></div>'; });
+  document.getElementById('cmpTable').innerHTML=h; }
+function applyStatic(){
+  document.documentElement.lang=S.lang;
+  document.querySelectorAll('[data-t]').forEach(function(el){ el.textContent=t(el.dataset.t); });
+  document.querySelectorAll('[data-th]').forEach(function(el){ el.innerHTML=t(el.dataset.th); });
+  buildUses(); buildCmp();
+}
+
+/* ================= everything downstream reads S ================= */
+function syncScreen(){
+  var li=L(), u=U();
+  document.querySelectorAll('#useList .cp-use').forEach(function(b){ b.classList.toggle('on', b.dataset.v===S.use); });
+  /* try it */
+  var tc=document.getElementById('taskCard');
+  tc.classList.toggle('ok',!!S.last);
+  document.getElementById('taskK').textContent = S.last ? '✓ '+t('try.done') : t('try.k');
+  document.getElementById('taskT').innerHTML = S.last ? t('try.res',{e:S.last.e,r:nf(S.last.r)}) : t('try.tap',{q:u.q[li]});
+  var eq=document.querySelector('#padTry [data-k="="]'); eq.classList.toggle('hl',!S.last);
+  /* paywall: their line, their order, their sum */
+  document.getElementById('payFor').textContent=u.f[li];
+  document.getElementById('rateV').textContent=RATE[S.lang][0];
+  document.getElementById('rateN').textContent=RATE[S.lang][1];
+  var e = S.last ? S.last.e+' = '+nf(S.last.r) : render(taskTokens())+' = '+nf(evalT(taskTokens()));
+  document.getElementById('featList').innerHTML=u.ord.map(function(k){ var f=FEAT[k];
+    var d = k==='notes' ? t('ft.notes',{e:'<em>'+e+'</em>'}) : f.d[li];
+    return '<div class="cp-ft"><span class="cp-fi" style="background:'+f.c+'"><svg viewBox="0 0 24 24">'+f.i+'</svg></span><div><b>'+f.t[li]+'</b><p>'+d+'</p></div></div>'; }).join('');
+  document.querySelectorAll('#planList .cp-plan').forEach(function(b){ b.classList.toggle('on', b.dataset.v===S.plan); });
+  var life=S.plan==='life';
+  document.getElementById('payHelp').textContent = t(S.plan==='month'?'h.m':S.plan==='year'?'h.y':'h.f');
+  document.getElementById('payLegal').textContent = t(life?'lg.f':'lg.t');
+  document.getElementById('payCta').textContent = t(life?'cta.f':'cta.t');
+  /* home */
+  document.getElementById('homeBanner').classList.toggle('hidden',S.bought);
+  document.getElementById('homePro').classList.toggle('hidden',!S.bought);
+}
+
+/* ================= router ================= */
+var ORDER=['splash','use','try','paywall','offer','att','home'];
+var LABEL={splash:'Splash',use:'What for',try:'Try it',paywall:'Paywall',offer:'Offer on close',att:'Tracking',home:'Calculator'};
+var scr={}, hist=[], cur='splash', splashT=null;
+document.querySelectorAll('.scr').forEach(function(s){ scr[s.dataset.id]=s; });
+
+function chrome(){ var dark=S.theme==='dark', l=dark || !!scr[cur].dataset.light;
+  document.getElementById('sbar').classList.toggle('light',l); document.getElementById('homebar').classList.toggle('light',l); }
+function enter(id){ chrome(); paintChips(); paintPanel(); clearTimeout(splashT);
+  document.getElementById('attSys').classList.remove('on');
+  if(id==='splash') splashT=setTimeout(function(){ if(cur==='splash') go('use'); },(demo.on?0.6:1)*1500);
+  if(id==='home'){ if(S.last && !calcHome.done && calcHome.tk.join()==='0'){ calcHome.res=S.last.r; calcHome.sub=S.last.e; calcHome.done=true; } paint(calcHome); }
+  if(id==='try') paint(calcTry); }
+function go(id,opts){
+  opts=opts||{}; if(id===cur) return;
+  var from=scr[cur], to=scr[id];
+  if(!opts.back) hist.push(cur);
+  if(from){ from.classList.remove('is-active');
+    if(!to.classList.contains('sheet') && !from.classList.contains('sheet')) from.classList.add('is-past'); }
+  Object.keys(scr).forEach(function(k){ if(k!==id&&k!==cur) scr[k].classList.remove('is-active'); });
+  if(to.classList.contains('sheet')) from.classList.add('is-active');
+  to.classList.remove('is-past'); to.classList.add('is-active');
+  cur=id; enter(id);
+}
+function back(){
+  if(!hist.length) return;
+  var prev=hist.pop();
+  scr[cur].classList.remove('is-active');
+  scr[prev].classList.remove('is-past'); scr[prev].classList.add('is-active');
+  cur=prev; enter(prev);
+}
+function jump(id){
+  var i=ORDER.indexOf(id);
+  Object.keys(scr).forEach(function(k){ scr[k].classList.add('nofx'); scr[k].classList.remove('is-active','is-past'); });
+  hist=ORDER.slice(0,i<0?0:i).filter(function(x){ return x!=='splash' && x!=='offer'; });
+  if(id==='offer') scr.paywall.classList.add('is-active');
+  if(id==='att' || id==='home'){ if(!S.last) S.last={e:render(taskTokens()),r:evalT(taskTokens())}; }
+  scr[id].classList.add('is-active'); cur=id;
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    Object.keys(scr).forEach(function(k){ scr[k].classList.remove('nofx'); }); }); });
+  syncScreen(); enter(id);
+}
+function paintChips(){
+  var c=document.getElementById('chips');
+  if(!c.children.length){ ORDER.forEach(function(id){
+      var b=document.createElement('button'); b.className='chip'+(id==='offer'?' offer':''); b.textContent=LABEL[id];
+      b.dataset.id=id; b.onclick=function(){ stopDemo(); jump(id); }; c.appendChild(b); }); }
+  c.querySelectorAll('.chip').forEach(function(b){ b.classList.toggle('on', b.dataset.id===cur); });
+}
+
+/* ================= wiring ================= */
+document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click',function(){ if(!b.disabled) go(b.dataset.go); }); });
+document.querySelectorAll('[data-back]').forEach(function(b){ b.addEventListener('click',back); });
+scr.splash.addEventListener('click',function(){ go('use'); });
+document.querySelectorAll('#planList .cp-plan').forEach(function(b){ b.addEventListener('click',function(){ S.plan=b.dataset.v; syncScreen(); }); });
+document.getElementById('payClose').addEventListener('click',function(){ go('offer'); });
+document.getElementById('payCta').addEventListener('click',function(){ S.bought=true; syncScreen(); go('att'); });
+document.getElementById('offerCta').addEventListener('click',function(){ S.bought=true; S.plan='life'; syncScreen(); go('att'); });
+document.getElementById('offClose').addEventListener('click',function(){ go('att'); });
+document.getElementById('offerNo').addEventListener('click',function(){ go('att'); });
+document.getElementById('attBtn').addEventListener('click',function(){ document.getElementById('attSys').classList.add('on'); });
+['sysNo','sysYes'].forEach(function(id){ document.getElementById(id).addEventListener('click',function(){ go('home'); }); });
+document.getElementById('homeBanner').addEventListener('click',function(){ go('paywall'); });
+
+function setSeg(id,attr,val){ document.querySelectorAll('#'+id+' button').forEach(function(b){ b.classList.toggle('on', b.dataset[attr]===val); }); }
+function setLang(l){
+  S.lang=l; S0.lang=l; setSeg('segLang','lang',l);
+  if(!S.last) presetTry(); else { S.last.e=render(calcTry.tk); }
+  applyStatic(); syncScreen(); paint(calcTry); paint(calcHome); paintPanel();
+}
+function setTheme(th){ S.theme=th; S0.theme=th; document.getElementById('phoneIn').classList.toggle('dark',th==='dark'); setSeg('segTheme','theme',th); chrome(); }
+document.querySelectorAll('#segLang button').forEach(function(b){ b.addEventListener('click',function(){ stopDemo(); setLang(b.dataset.lang); }); });
+document.querySelectorAll('#segTheme button').forEach(function(b){ b.addEventListener('click',function(){ setTheme(b.dataset.theme); }); });
+
+/* ================= the 30-second walkthrough ================= */
+var demo={tok:0,on:false,t0:0,iv:null}, finger=document.getElementById('finger'), phoneIn=document.getElementById('phoneIn');
+function W(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function cap(txt){ document.getElementById('demoTxt').textContent=txt; }
+async function tap(sel,tok){
+  if(demo.tok!==tok) throw 0;
+  var el=document.querySelector(sel); if(!el) return;
+  var r=el.getBoundingClientRect(), p=phoneIn.getBoundingClientRect(), z=p.width/phoneIn.offsetWidth||1;
+  finger.style.left=((r.left-p.left+r.width/2)/z)+'px'; finger.style.top=((r.top-p.top+r.height/2)/z)+'px';
+  finger.classList.add('show'); await W(380); if(demo.tok!==tok) throw 0;
+  finger.classList.add('press'); el.classList.add('prs'); await W(120); finger.classList.remove('press'); el.classList.remove('prs'); el.click(); await W(160);
+  if(demo.tok!==tok) throw 0;
+}
+async function pause(ms,tok){ await W(ms); if(demo.tok!==tok) throw 0; }
+function startDemo(){
+  stopDemo(); var tok=++demo.tok; demo.on=true; demo.t0=Date.now();
+  var keep={lang:S.lang,theme:S.theme}; S=defaults(); S.lang=keep.lang; S.theme=keep.theme; S.use='tax';
+  calcHome.tk=['0']; calcHome.done=false; calcHome.sub='';
+  applyStatic(); presetTry(); jump('splash');
+  document.getElementById('demoCap').classList.remove('hidden');
+  demo.iv=setInterval(function(){ document.getElementById('demoProg').style.width=Math.min(100,(Date.now()-demo.t0)/290)+'%'; },200);
+  (async function(){
+    try{
+      cap('A new install: your splash, then one question — not a tracking prompt.'); await pause(1500,tok);
+      cap('What will they use it for? They switch from tax to shopping.'); await pause(500,tok);
+      await tap('#useList [data-v=shop]',tok); await pause(450,tok); await tap('[data-id=use] .cp-btn',tok);
+      cap('One real sum on your own keypad, before any price.'); await pause(1100,tok);
+      await tap('#padTry [data-k="="]',tok); await pause(1300,tok);
+      await tap('#tryBtn',tok);
+      cap('The paywall names what they picked, shows their own sum and your 4.8.'); await pause(2300,tok);
+      await tap('#planList [data-v=month]',tok); await pause(800,tok); await tap('#planList [data-v=year]',tok); await pause(600,tok);
+      cap('They close it. One second chance: your Forever plan, 14,99 €, paid once.'); await tap('#payClose',tok); await pause(3000,tok);
+      cap('That is the flow. Tracking comes next, after the paywall — tap “Not now” to see it.');
+      finger.classList.remove('show'); await pause(3200,tok); stopDemo();
+    }catch(e){}
+  })();
+}
+function stopDemo(){ if(!demo.on) return; demo.tok++; demo.on=false; clearInterval(demo.iv); finger.classList.remove('show','press');
+  document.getElementById('demoCap').classList.add('hidden'); }
+document.getElementById('demoBtn').addEventListener('click',startDemo);
+document.getElementById('demoStop').addEventListener('click',stopDemo);
+phoneIn.addEventListener('pointerdown',function(e){ if(e.isTrusted && demo.on) stopDemo(); });
+</script>
+<script>
+/* ---- the short panel: hypothesis + potential outcome, nothing else ---- */
+var PANEL = {
+splash:{ctx:true,t:'Your splash',
+ kept:'The black splash with the plus icon, exactly as it ships. The only change is what comes after it: a question instead of the tracking prompt.'},
+use:{n:4,t:'Name what they calculate on the paywall',
+ hyp:'Try one question before anything else, <b>because the answer then picks the sum they try next, the line under your wordmark and which PRO feature is listed first</b>. Today the app never asks, so every paywall reads the same.',
+ kept:'Your plan-tile surfaces and teal selection, the outline icon style of your tracking screen, and your Continue button.',
+ out:'CR +15–20%'},
+try:{n:2,t:'Let them calculate before the price',
+ hyp:'Try putting one real sum in their hands, <b>because today the paywall comes second, straight after the tracking prompt, before anyone has pressed a key</b>. The keypad works: tap anything, and the result goes on to the paywall.',
+ kept:'Your brushed-metal background, blue display, memory row, red AC, orange equals and backspace key, rebuilt as a working calculator.',
+ out:'CR +10–20%'},
+paywall:{n:4,t:'Name what they calculate on the paywall',
+ hyp:'Try a line under your wordmark that names what they picked, and lead the list with the feature that fits, <b>because a shopper should see TAX first and a student should see Notes first</b>. The Notes row shows the sum they just did. Go back and pick another use to see it change.',
+ out:'CR +15–20%',
+ n2:5, hyp2:'Try your 4.8 from 5.1K ratings and the NBC, ABC, Good Morning America, Gizmodo and GeekWire logos above the features, <b>because they sit on your App Store screenshots but nowhere in the app</b>.',
+ out2:'CR +10–15%',
+ kept:'Your icon, the Calculator Plus PRO wordmark, the coloured feature icons, the three plan tiles with Save 60% and the struck 23,88 €, the helper and legal lines, Try for free, Get PRO and the footer links.'},
+offer:{n:1,t:'Offer the one-time 14,99 € when they close',
+ hyp:'Try a second screen on close that compares free with PRO and sells only Forever, <b>because today the X drops people straight into the calculator, and someone who just said no to a subscription may still pay once</b>. 14,99 € is your own App Store price, so nothing here is a discount.',
+ kept:'Your icon, wordmark, plan tile, “Pay once — use forever” line, legal copy and Get PRO button. The comparison rows are the features from your own paywall.',
+ out:'ARPU +10–15%'},
+att:{n:3,t:'Ask about tracking after the paywall',
+ hyp:'Try your tracking screen after the paywall instead of before it, <b>because a system dialog as the first thing anyone sees pulls attention away right before the price</b>. Same screen, same words, one step later in the same first session.',
+ kept:'Your illustration, headline, both reasons, the grey Settings card and Continue. The dialog is Apple’s own.',
+ out:'CR +10–15%'},
+home:{ctx:true,t:'The calculator',
+ kept:'Where the flow hands over, untouched: your PRO banner, header and keypad. Their last sum is already on the display. Buy PRO in the prototype and the banner goes away.'}
+};
+
+function outBlock(lab,val){
+  return '<div class="pn-out"><div class="lab">'+lab+'</div><div class="v">'+val+'</div></div>';
+}
+function paintPanel(){
+  var d=PANEL[cur]; if(!d) return;
+  var h='';
+  if(d.ctx){
+    h += '<div class="pn-n ctx">Context · no change proposed</div><h3 class="pn-t">'+d.t+'</h3>'
+       + '<div class="pn-kept">'+d.kept+'</div>';
+  } else {
+    h += '<div class="pn-n">Idea '+d.n+' of 5</div><h3 class="pn-t">'+d.t+'</h3>'
+       + '<p class="pn-hyp">'+d.hyp+'</p>'
+       + outBlock('Potential outcome · based on Adapty data', d.out);
+    if(d.hyp2){
+      h += '<div class="pn-sep"></div>'
+         + '<div class="pn-n">Idea '+d.n2+' of 5</div>'
+         + '<p class="pn-hyp" style="margin-top:12px">'+d.hyp2+'</p>'
+         + outBlock('Potential outcome · based on Adapty data', d.out2);
+    }
+    h += '<div class="pn-kept"><b>Your design, unchanged.</b> '+d.kept+'</div>';
+  }
+  if(S.lang!=='en') h += '<div class="pn-kept"><b>Language.</b> Screens are shown in '+(S.lang==='de'?'German':'French')+' to show one flow serving every market — translated by us. Store prices stay as published in euros, and the rating is the one your '+(S.lang==='de'?'German':'French')+' App Store shows.</div>';
+  h += '<div class="pn-foot">Ranges are Adapty’s expected effect from tests across 30,000+ subscription apps — not measured lift for Calculator Plus. '
+     + 'Prices, ratings, press logos and feature lines come from your own published material.</div>';
+  document.getElementById('panel').innerHTML = h;
+}
+
+/* ---- views, jumps from the overview ---- */
+function showView(v){
+  if(v!=='proto') stopDemo();
+  document.querySelectorAll('.view').forEach(function(x){ x.classList.remove('on'); });
+  document.getElementById('view-'+v).classList.add('on');
+  document.querySelectorAll('.nav-links button[data-view]').forEach(function(b){ b.classList.toggle('on', b.dataset.view===v); });
+  window.scrollTo(0,0);
+  if(v==='proto' && cur==='splash') enter('splash');
+}
+document.querySelectorAll('[data-view]').forEach(function(b){ b.addEventListener('click',function(){ showView(b.dataset.view); }); });
+document.querySelectorAll('.idea[data-jump]').forEach(function(b){
+  b.addEventListener('click',function(){ showView('proto'); jump(b.dataset.jump); });
+});
+document.querySelectorAll('[data-demo]').forEach(function(b){ b.addEventListener('click',function(){ showView('proto'); startDemo(); }); });
+
+applyStatic(); presetTry(); paint(calcHome);
+scr.splash.classList.add('is-active');
+syncScreen(); chrome(); paintChips(); paintPanel();
+if(/[?&]open=proto/.test(location.search)) showView('proto'); else clearTimeout(splashT);
+</script>
+</body>
+</html>
